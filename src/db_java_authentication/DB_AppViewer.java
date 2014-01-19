@@ -3,12 +3,8 @@
  */ 
 
 package db_java_authentication;
-//import java.util.*;
-//import javax.swing.*;
 
 import java.io.IOException;
-
-//import java.util.logging.*;
 
 /**
  *
