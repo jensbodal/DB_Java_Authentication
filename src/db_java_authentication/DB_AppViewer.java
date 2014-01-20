@@ -24,7 +24,7 @@ public class DB_AppViewer {
      */
     public static void main(String[] args) throws IOException {
         DB_Authentication DBA = new DB_Authentication();
-        DBA.DB_NewAuth();
+        DBA.getAccountInfo();
     }
     
     

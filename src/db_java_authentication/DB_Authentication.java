@@ -4,34 +4,84 @@
 
 package db_java_authentication;
 import com.dropbox.core.*;
-import com.dropbox.core.json.JsonReader.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.dropbox.core.json.*;
+import java.io.*;
 import java.util.Locale;
 /**
  *
  * @author Jens Bodal
  */
 public class DB_Authentication {
+    // final variables
+    private static final String USERHOME = System.getProperty("user.home");
+    private static final String HOST_OS = System.getProperty("os.name");
+    private static final int TAB = 4;
     
+    // private variables
+    private static String DB_AuthFilePath = (USERHOME + "/DB_AuthFiles");
+    private File appinfo_file = new File(DB_AuthFilePath + 
+            "/App_Info.json");
+    private File appauth_file = new File(DB_AuthFilePath + 
+            "/App_Auth.json");
+    private DbxAppInfo appInfo = null;
+    DbxClient DBC;
     
-    public DB_Authentication() {
-        // Default Constructor
+    public DB_Authentication() throws IOException {
+        setDB_AuthFiles();
+        if (checkAuthFiles()) {
+            DB_Auth();
+        }
+        else {
+            System.out.println("Missing one or more authentication files");
+            System.out.println("Call DB_NewAuth()");
+            DB_NewAuth();
+        }
     }
     
-    public void DB_NewAuth() throws IOException {
-        DbxAppInfo appInfo = null;
-        try {
-            appInfo = DbxAppInfo.Reader.readFromFile("auth/app-info.json");
+    private void setDB_AuthFiles() {
+        File DB_AuthFiles = new File(DB_AuthFilePath);
+        if (HOST_OS.toLowerCase().contains("win")) {
+            DB_AuthFilePath = DB_AuthFilePath.replace("/", "\\");
         }
-        catch (FileLoadException e) {
-            System.out.printf("DB_NewAuth() Reader error: %s%n", e);
+        if (!DB_AuthFiles.exists()) {
+            System.out.printf("Directory does not exists, attempting to "
+                    + "create directory: %s%n", DB_AuthFilePath);
+            try {
+                DB_AuthFiles.mkdir();
+            }
+            catch (SecurityException e) {
+                System.out.printf("Error creating DB_AuthFilePath: %s%n",
+                        e);
+            }
+        }
+    }
+    
+    private boolean checkAuthFiles() {
+        if (!appinfo_file.exists()) {
+            System.out.println("appinfo_file missing");
+            return false;
+        }
+        else if (!appauth_file.exists()) {
+            System.out.println("appauth_file missing");
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    
+    private void DB_NewAuth() throws IOException {
+        try {
+            appInfo = DbxAppInfo.Reader.readFromFile(appinfo_file);
+        }
+        catch (JsonReader.FileLoadException e) {
+            System.out.println(e);
+            setAppInfo();
         }
         
         // Run through Dropbox API authorization process
         String userLocale = Locale.getDefault().toString();
-        DbxRequestConfig requestConfig = new DbxRequestConfig("examples-authorize", userLocale);
+        DbxRequestConfig requestConfig = new DbxRequestConfig("DB_Authorize", userLocale);
         DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(requestConfig, appInfo);
 
         String authorizeUrl = webAuth.start();
@@ -68,7 +118,7 @@ public class DB_Authentication {
 
         // Save auth information to output file.
         DbxAuthInfo authInfo = new DbxAuthInfo(authFinish.accessToken, appInfo.host);
-        String argAuthFileOutput = "auth/something.json";
+        String argAuthFileOutput = appauth_file.getAbsolutePath();
         try {
             DbxAuthInfo.Writer.writeToFile(authInfo, argAuthFileOutput);
             System.out.println("Saved authorization information to \"" + argAuthFileOutput + "\".");
@@ -81,7 +131,86 @@ public class DB_Authentication {
         }
     }
     
-    public void DB_Auth() {
+    private void DB_Auth() {
+        // Read auth info file.
+        DbxAuthInfo authInfo;
+        try {
+            authInfo = DbxAuthInfo.Reader.readFromFile(appauth_file);
+        }
+        catch (JsonReader.FileLoadException ex) {
+            System.err.println("Error loading <auth-file>: " + ex.getMessage());
+            System.exit(1); return;
+        }
+        
+        // Create a DbxClient, which is what you use to make API calls.
+        String userLocale = Locale.getDefault().toString();
+        DbxRequestConfig requestConfig = new DbxRequestConfig("examples-account-info", userLocale);
+        DBC = new DbxClient(
+                requestConfig, authInfo.accessToken, authInfo.host);
+    }
+    
+    private void accountInfo() {
+        // Make the /account/info API call.
+        DbxAccountInfo dbxAccountInfo;
+        try {
+            dbxAccountInfo = DBC.getAccountInfo();
+        }
+        catch (DbxException ex) {
+            ex.printStackTrace();
+            System.err.println("Error in getAccountInfo(): " + ex.getMessage());
+            System.exit(1); return;
+        }
+        System.out.println("User's account info: " + dbxAccountInfo.toStringMultiline());
+    }
+    
+    public void getAccountInfo() {
+        accountInfo();
+    }
+    
+    private void setAppInfo() throws IOException {
+        String appKey;
+        String appSecret;
+        String app_info;
+        
+        System.out.print("Enter your APP Key: ");
+        appKey = new BufferedReader(
+                new InputStreamReader(System.in)).readLine();
+        
+        System.out.print("Enter your APP Secret: ");
+        appSecret = new BufferedReader(
+                new InputStreamReader(System.in)).readLine();
+        
+        appKey = String.format("\"key\" : \"%s\",", appKey);
+        appSecret = String.format("\"secret\" : \"%s\"", appSecret);
+        int keyPadding = appKey.length() + TAB;
+        int secretPadding = appSecret.length() + TAB;
+        
+        app_info = String.format(
+                "{%n%" + keyPadding + "s%n%" + secretPadding + "s%n}", 
+                appKey, appSecret);
+        
+        appinfo_file.createNewFile();
+        FileWriter write = new FileWriter(appinfo_file);
+        write.write(app_info);
+        write.close();
+        System.out.println("AppInfo.json file created");
+        try {
+            appInfo = DbxAppInfo.Reader.readFromFile(appinfo_file);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    
+    private void setApp_Secret() {
+        
+    }
+    
+    private void getApp_Key() {
+        
+    }
+    
+    private void getApp_Secret() {
         
     }
     
