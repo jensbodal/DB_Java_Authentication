@@ -10,6 +10,7 @@ import java.util.Locale;
 /**
  *
  * @author Jens Bodal
+ * Example code used from Drpobox API SDK examples
  */
 public class DB_Authentication {
     // final variables
@@ -26,16 +27,24 @@ public class DB_Authentication {
     private DbxAppInfo appInfo = null;
     DbxClient DBC;
     
-    public DB_Authentication() throws IOException {
+    public DB_Authentication() {
         setDB_AuthFiles();
         if (checkAuthFiles()) {
             DB_Auth();
         }
         else {
             System.out.println("Missing one or more authentication files");
-            System.out.println("Calling DB_NewAuth()...");
+            System.out.println("Call DB_NewAuth()...");
+        }
+    }
+    
+    public void init_newDBAuth() {
+        try {
             DB_NewAuth();
-            DB_Auth();
+        }
+
+        catch (IOException e) {
+            System.out.println(e);
         }
     }
     
@@ -128,6 +137,7 @@ public class DB_Authentication {
             DbxAuthInfo.Writer.writeToFile(authInfo, argAuthFileOutput);
             System.out.println("Saved authorization information to \"" + 
                     argAuthFileOutput + "\".");
+            DB_Auth();
         }
         catch (IOException ex) {
             System.err.println("Error saving to <auth-file-out>: " + 

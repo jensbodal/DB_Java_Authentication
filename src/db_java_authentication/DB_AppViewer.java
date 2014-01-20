@@ -5,6 +5,7 @@
 package db_java_authentication;
 
 import java.io.IOException;
+import javax.swing.JFrame;
 
 /**
  *
@@ -23,7 +24,9 @@ public class DB_AppViewer {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        DB_Authentication DBA = new DB_Authentication();
-        DBA.getAccountInfo();
+        DB_AppGUI GUI = new DB_AppGUI();
+        GUI.setTitle(GUI.getTitle());
+        GUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        GUI.setVisible(true);
     }
 }
