@@ -26,7 +26,4 @@ public class DB_AppViewer {
         DB_Authentication DBA = new DB_Authentication();
         DBA.getAccountInfo();
     }
-    
-    
-
 }
