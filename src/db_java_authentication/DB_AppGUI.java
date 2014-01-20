@@ -93,6 +93,7 @@ public class DB_AppGUI extends JFrame {
                 System.exit(0);
             }
             catch (NullPointerException e) {
+                System.out.println(e);
             }
         }
     };
@@ -104,6 +105,7 @@ public class DB_AppGUI extends JFrame {
                 DBA.init_newDBAuth();
             }
             catch (NullPointerException e) {
+                System.out.println(e);
             }
         }
     };
@@ -112,10 +114,12 @@ public class DB_AppGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent ae) {
             try {
+                System.out.println(ae.getActionCommand());
                 mainTextArea.setText(DBA.getAccountInfo());
                 mainTextField.setText(DBA.getRequestConfig());
             }
             catch (NullPointerException e) {
+                System.out.println(e);
             }
         }
     };
