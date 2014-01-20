@@ -16,7 +16,7 @@ import javax.swing.*;
  */
 public class DB_AppGUI extends JFrame {
     private static final int FRAME_WIDTH = 700;
-    private static final int FRAME_HEIGHT = 250;
+    private static final int FRAME_HEIGHT = 400;
     private static final int FRAME_X = 40;
     private static final int FRAME_Y = 40;
     private static final String TITLE = "Dropbox Authentication Example";
@@ -24,6 +24,8 @@ public class DB_AppGUI extends JFrame {
     private static DB_Authentication DBA;
     // private variables
     private JPanel mainFrame;
+    private JTextArea mainTextArea = new JTextArea();
+    private JTextField mainTextField = new JTextField();
     
     public DB_AppGUI() {
         DBA = new DB_Authentication();
@@ -32,6 +34,8 @@ public class DB_AppGUI extends JFrame {
         mainFrame.setLayout(MAINLAYOUT);
         
         // Add Components
+        mainFrame.add(mainTextArea, BorderLayout.NORTH);
+        mainFrame.add(mainTextField, BorderLayout.SOUTH);
         
         // Display GUI
         this.setResizable(false);
@@ -78,6 +82,10 @@ public class DB_AppGUI extends JFrame {
         return menuBar;
     }
     
+
+    
+    
+    // Action Listeners
     private ActionListener menu_file_exit = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent ae) {
@@ -104,7 +112,8 @@ public class DB_AppGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent ae) {
             try {
-                DBA.getAccountInfo();
+                mainTextArea.setText(DBA.getAccountInfo());
+                mainTextField.setText(DBA.getRequestConfig());
             }
             catch (NullPointerException e) {
             }

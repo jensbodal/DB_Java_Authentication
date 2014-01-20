@@ -166,24 +166,26 @@ public class DB_Authentication {
                 requestConfig, authInfo.accessToken, authInfo.host);
     }
     
-    private void accountInfo() {
+    public String getAccountInfo() {
         // Make the /account/info API call.
-        DbxAccountInfo dbxAccountInfo;
+        DbxAccountInfo dbxAccountInfo = null;
         try {
             dbxAccountInfo = DBC.getAccountInfo();
         }
         catch (DbxException ex) {
             System.err.println("Error in getAccountInfo(): " + ex.getMessage());
-            System.exit(1); return;
+            System.exit(1); 
         }
-        System.out.println("User's account info: " + 
-                dbxAccountInfo.toStringMultiline());
+        return dbxAccountInfo.toStringMultiline();
     }
     
-    public void getAccountInfo() {
-        accountInfo();
+    public String getAccessToken() {
+        return DBC.getAccessToken();
     }
-    
+     
+    public String getRequestConfig() {
+        return DBC.getRequestConfig().toString();
+    }
     private void setAppInfo() throws IOException {
         String app_key;
         String app_secret;
