@@ -33,8 +33,9 @@ public class DB_Authentication {
         }
         else {
             System.out.println("Missing one or more authentication files");
-            System.out.println("Call DB_NewAuth()");
+            System.out.println("Calling DB_NewAuth()...");
             DB_NewAuth();
+            DB_Auth();
         }
     }
     
@@ -81,18 +82,21 @@ public class DB_Authentication {
         
         // Run through Dropbox API authorization process
         String userLocale = Locale.getDefault().toString();
-        DbxRequestConfig requestConfig = new DbxRequestConfig("DB_Authorize", userLocale);
-        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(requestConfig, appInfo);
+        DbxRequestConfig requestConfig = new DbxRequestConfig(
+                "DB_Authorize", userLocale);
+        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(
+                requestConfig, appInfo);
 
         String authorizeUrl = webAuth.start();
         System.out.println("1. Go to " + authorizeUrl);
-        System.out.println("2. Click \"Allow\" (you might have to log in first).");
+        System.out.println("2. Click \"Allow\" (you might have to log in).");
         System.out.println("3. Copy the authorization code.");
         System.out.print("Enter the authorization code here: ");
         
         String code = "";
         try {
-            code = new BufferedReader(new InputStreamReader(System.in)).readLine();
+            code = new BufferedReader(
+                    new InputStreamReader(System.in)).readLine();
             if (code == null) {
                 System.exit(1); return;
             }
@@ -117,17 +121,19 @@ public class DB_Authentication {
         System.out.println("- Access Token: " + authFinish.accessToken);
 
         // Save auth information to output file.
-        DbxAuthInfo authInfo = new DbxAuthInfo(authFinish.accessToken, appInfo.host);
+        DbxAuthInfo authInfo = new DbxAuthInfo(
+                authFinish.accessToken, appInfo.host);
         String argAuthFileOutput = appauth_file.getAbsolutePath();
         try {
             DbxAuthInfo.Writer.writeToFile(authInfo, argAuthFileOutput);
-            System.out.println("Saved authorization information to \"" + argAuthFileOutput + "\".");
+            System.out.println("Saved authorization information to \"" + 
+                    argAuthFileOutput + "\".");
         }
         catch (IOException ex) {
-            System.err.println("Error saving to <auth-file-out>: " + ex.getMessage());
+            System.err.println("Error saving to <auth-file-out>: " + 
+                    ex.getMessage());
             System.err.println("Dumping to stderr instead:");
             DbxAuthInfo.Writer.writeToStream(authInfo, System.err);
-            System.exit(1); return;
         }
     }
     
@@ -144,7 +150,8 @@ public class DB_Authentication {
         
         // Create a DbxClient, which is what you use to make API calls.
         String userLocale = Locale.getDefault().toString();
-        DbxRequestConfig requestConfig = new DbxRequestConfig("examples-account-info", userLocale);
+        DbxRequestConfig requestConfig = new DbxRequestConfig(
+                "DB_Authentication.java", userLocale);
         DBC = new DbxClient(
                 requestConfig, authInfo.accessToken, authInfo.host);
     }
@@ -156,11 +163,11 @@ public class DB_Authentication {
             dbxAccountInfo = DBC.getAccountInfo();
         }
         catch (DbxException ex) {
-            ex.printStackTrace();
             System.err.println("Error in getAccountInfo(): " + ex.getMessage());
             System.exit(1); return;
         }
-        System.out.println("User's account info: " + dbxAccountInfo.toStringMultiline());
+        System.out.println("User's account info: " + 
+                dbxAccountInfo.toStringMultiline());
     }
     
     public void getAccountInfo() {
@@ -168,31 +175,31 @@ public class DB_Authentication {
     }
     
     private void setAppInfo() throws IOException {
-        String appKey;
-        String appSecret;
+        String app_key;
+        String app_secret;
         String app_info;
         
         System.out.print("Enter your APP Key: ");
-        appKey = new BufferedReader(
+        app_key = new BufferedReader(
                 new InputStreamReader(System.in)).readLine();
         
         System.out.print("Enter your APP Secret: ");
-        appSecret = new BufferedReader(
+        app_secret = new BufferedReader(
                 new InputStreamReader(System.in)).readLine();
         
-        appKey = String.format("\"key\" : \"%s\",", appKey);
-        appSecret = String.format("\"secret\" : \"%s\"", appSecret);
-        int keyPadding = appKey.length() + TAB;
-        int secretPadding = appSecret.length() + TAB;
+        app_key = String.format("\"key\" : \"%s\",", app_key);
+        app_secret = String.format("\"secret\" : \"%s\"", app_secret);
+        int keyPadding = app_key.length() + TAB;
+        int secretPadding = app_secret.length() + TAB;
         
         app_info = String.format(
                 "{%n%" + keyPadding + "s%n%" + secretPadding + "s%n}", 
-                appKey, appSecret);
+                app_key, app_secret);
         
         appinfo_file.createNewFile();
-        FileWriter write = new FileWriter(appinfo_file);
-        write.write(app_info);
-        write.close();
+        try (FileWriter write = new FileWriter(appinfo_file)) {
+            write.write(app_info);
+        }
         System.out.println("AppInfo.json file created");
         try {
             appInfo = DbxAppInfo.Reader.readFromFile(appinfo_file);
@@ -201,17 +208,4 @@ public class DB_Authentication {
             System.out.println(e);
         }
     }
-    
-    private void setApp_Secret() {
-        
-    }
-    
-    private void getApp_Key() {
-        
-    }
-    
-    private void getApp_Secret() {
-        
-    }
-    
 }
