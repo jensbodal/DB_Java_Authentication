@@ -179,6 +179,15 @@ public class DB_Authentication {
         return dbxAccountInfo.toStringMultiline();
     }
     
+    public String getFolders() {
+        try { 
+            return DBC.getMetadataWithChildren("/").toStringMultiline();
+        }
+        catch (Exception e) {
+            return e.toString();
+        }
+    }
+    
     public String getAccessToken() {
         return DBC.getAccessToken();
     }

@@ -65,6 +65,9 @@ public class DB_AppGUI extends JFrame {
                 new JMenuItem("Get Account Information");
         getAccountInfo.addActionListener(DBAL_getAccountInfo);
         dropboxMenu.add(getAccountInfo);
+        JMenuItem getFolders = new JMenuItem("Get Folders");
+        getFolders.addActionListener(DBAL_getFolders);
+        dropboxMenu.add(getFolders);
         
         // Tools Menu
         JMenu toolsMenu = new JMenu("Tools");
@@ -124,5 +127,17 @@ public class DB_AppGUI extends JFrame {
         }
     };
     
+    private ActionListener DBAL_getFolders = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {
+                System.out.println(ae.getActionCommand());
+                mainTextArea.setText(DBA.getFolders());
+            }
+            catch (NullPointerException e) {
+                System.out.println(e);
+            }
+        }
+    };
     
 }
