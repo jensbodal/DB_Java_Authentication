@@ -7,18 +7,20 @@ import com.dropbox.core.*;
 import com.dropbox.core.json.*;
 import java.io.*;
 import java.util.Locale;
+
+
 /**
  *
  * @author Jens Bodal
  * Example code used from Drpobox API SDK examples
  */
 public class DB_Authentication {
-    // final variables
+    // Dropbox final variables
     private static final String USERHOME = System.getProperty("user.home");
     private static final String HOST_OS = System.getProperty("os.name");
     private static final int TAB = 4;
     
-    // private variables
+    // Dropbox private variables
     private static String DB_AuthFilePath = (USERHOME + "/DB_AuthFiles");
     private File appinfo_file = new File(DB_AuthFilePath + 
             "/App_Info.json");
